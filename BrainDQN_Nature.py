@@ -12,7 +12,7 @@ from collections import deque
 # Hyper Parameters:
 FRAME_PER_ACTION = 1
 GAMMA = 0.95 # decay rate of past observations
-OBSERVE = 50000. # timesteps to observe before training
+OBSERVE = 5000. # timesteps to observe before training
 EXPLORE = 1000000. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.1#0.001 # final value of epsilon
 INITIAL_EPSILON = 1.0#0.01 # starting value of epsilon
@@ -46,7 +46,7 @@ class BrainDQN:
 		self.session = tf.InteractiveSession()
 		self.session.run(tf.global_variables_initializer())
 
-		checkpoint = tf.train.get_checkpoint_state('./savedweights/actions_' + str(actions))
+		checkpoint = tf.train.get_checkpoint_state('./savedweights/actions_' + str(actions) + '/')
 		if checkpoint and checkpoint.model_checkpoint_path:
 				self.saver.restore(self.session, checkpoint.model_checkpoint_path)
 				print("Successfully loaded:", checkpoint.model_checkpoint_path)
@@ -138,8 +138,8 @@ class BrainDQN:
 			})
 
 		# save network every 10000 iteration
-		if self.timeStep % 10000 == 0:
-			self.saver.save(self.session, './savedweights/actions_' + str(self.actions) + '-dqn', global_step = self.timeStep)
+		if self.timeStep % 1000 == 0:
+			self.saver.save(self.session, './savedweights/actions_' + str(self.actions) + '/' 'network-dqn', global_step = self.timeStep)
 
 		if self.timeStep % UPDATE_TIME == 0:
 			self.copyTargetQNetwork()
