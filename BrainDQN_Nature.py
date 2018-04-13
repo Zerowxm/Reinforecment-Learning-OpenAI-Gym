@@ -22,12 +22,14 @@ UPDATE_TIME = 10000
 
 class BrainDQN:
 
-	def __init__(self,actions):
+	def __init__(self,actions, train = False):
 		# init replay memory
 		self.replayMemory = deque()
+		self.toTrain = train
+
 		# init some parameters
 		self.timeStep = 0
-		self.epsilon = INITIAL_EPSILON
+		self.epsilon = INITIAL_EPSILON if train else FINAL_EPSILON
 		self.actions = actions
 		# init Q network
 		self.stateInput,self.QValue,self.W_conv1,self.b_conv1,self.W_conv2,self.b_conv2,self.W_conv3,self.b_conv3,self.W_fc1,self.b_fc1,self.W_fc2,self.b_fc2 = self.createQNetwork()
@@ -43,12 +45,21 @@ class BrainDQN:
 		self.saver = tf.train.Saver()
 		self.session = tf.InteractiveSession()
 		self.session.run(tf.global_variables_initializer())
-		checkpoint = tf.train.get_checkpoint_state("./savedweights")
+
+		checkpoint = tf.train.get_checkpoint_state('./savedweights/actions_' + str(actions))
 		if checkpoint and checkpoint.model_checkpoint_path:
 				self.saver.restore(self.session, checkpoint.model_checkpoint_path)
 				print("Successfully loaded:", checkpoint.model_checkpoint_path)
+				for s in checkpoint.model_checkpoint_path.split('-'):
+					if s.isdigit():
+						self.timesteps = int(s)
+
 		else:
 				print("Could not find old network weights")
+		if self.toTrain:
+			print('Training mode')
+		else:
+			print('Testing mode')
 
 
 	def createQNetwork(self):
@@ -126,9 +137,9 @@ class BrainDQN:
 			self.stateInput : state_batch
 			})
 
-		# save network every 100000 iteration
+		# save network every 10000 iteration
 		if self.timeStep % 10000 == 0:
-			self.saver.save(self.session, './savedweights/network' + '-dqn', global_step = self.timeStep)
+			self.saver.save(self.session, './savedweights/actions_' + str(self.actions) + '-dqn', global_step = self.timeStep)
 
 		if self.timeStep % UPDATE_TIME == 0:
 			self.copyTargetQNetwork()
