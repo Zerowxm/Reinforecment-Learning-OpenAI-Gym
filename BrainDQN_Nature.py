@@ -1,9 +1,3 @@
-# -----------------------------
-# File: Deep Q-Learning Algorithm
-# Author: Flood Sung
-# Date: 2016.3.21
-# -----------------------------
-
 import tensorflow as tf 
 import numpy as np 
 import random
@@ -112,8 +106,6 @@ class BrainDQN:
 
 
 	def trainQNetwork(self):
-
-		
 		# Step 1: obtain random minibatch from replay memory
 		minibatch = random.sample(self.replayMemory,BATCH_SIZE)
 		state_batch = [data[0] for data in minibatch]

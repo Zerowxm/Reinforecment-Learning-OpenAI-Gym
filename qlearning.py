@@ -1,21 +1,23 @@
+%matplotlib inline
+
+import gym
+import itertools
+import matplotlib
+import numpy as np
+import pandas as pd
+import sys
 
 
+if "../" not in sys.path:
+  sys.path.append("../") 
+
+from collections import defaultdict
+from lib.envs.cliff_walking import CliffWalkingEnv
+from lib import plotting
+
+matplotlib.style.use('ggplot')
 
 def make_epsilon_greedy_policy(Q, epsilon, nA):
-    """
-    Creates an epsilon-greedy policy based on a given Q-function and epsilon.
-    
-    Args:
-        Q: A dictionary that maps from state -> action-values.
-            Each value is a numpy array of length nA (see below)
-        epsilon: The probability to select a random action . float between 0 and 1.
-        nA: Number of actions in the environment.
-    
-    Returns:
-        A function that takes the observation as an argument and returns
-        the probabilities for each action in the form of a numpy array of length nA.
-    
-    """
     def policy_fn(observation):
         A = np.ones(nA, dtype=float) * epsilon / nA
         best_action = np.argmax(Q[observation])
@@ -93,6 +95,5 @@ def random_exploration(env, num_episodes):
             rewardTracker.append(g)
             state = env.reset()
             episodes -= 1
-            
             
     print("Reached goal after {} episodes with a average return of {}".format(num_episodes, sum(rewardTracker)/len(rewardTracker)))
